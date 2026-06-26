@@ -30,9 +30,8 @@ export default function SettingsModal(props: SettingsModalProps) {
 
                             <div class="modal-header">
                                 <h5 class="modal-title">Settings</h5>
-                                <button
-                                    class="btn-close"
-                                    onClick={props.onClose}
+                                <button class="btn-close"
+                                        onClick={props.onClose}
                                 />
                             </div>
 
@@ -41,10 +40,8 @@ export default function SettingsModal(props: SettingsModalProps) {
                                 <div class="d-flex justify-content-between mb-3">
                                     <h6>Music Folders</h6>
 
-                                    <button
-                                        class="btn btn-primary btn-sm"
-                                        onClick={addFolder}
-                                    >
+                                    <button class="btn btn-primary btn-sm"
+                                            onClick={addFolder}>
                                         Add Folder
                                     </button>
                                 </div>
@@ -55,9 +52,8 @@ export default function SettingsModal(props: SettingsModalProps) {
                                             <li class="list-group-item d-flex justify-content-between">
                                                 {folder}
 
-                                                <button
-                                                    class="btn btn-danger btn-sm"
-                                                    onClick={() => removeFolder(index())}
+                                                <button class="btn btn-danger btn-sm"
+                                                        onClick={() => removeFolder(index())}
                                                 >
                                                     Remove
                                                 </button>
@@ -69,16 +65,14 @@ export default function SettingsModal(props: SettingsModalProps) {
                             </div>
 
                             <div class="modal-footer">
-                                <button
-                                    class="btn btn-secondary"
-                                    onClick={props.onClose}
+                                <button class="btn btn-secondary"
+                                        onClick={props.onClose}
                                 >
                                     Cancel
                                 </button>
 
-                                <button
-                                    class="btn btn-primary"
-                                    onClick={() => props.onSave(folders())}
+                                <button class="btn btn-primary"
+                                        onClick={() => props.onSave(folders())}
                                 >
                                     OK
                                 </button>
