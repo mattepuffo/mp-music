@@ -1,4 +1,5 @@
 use rusqlite::{Connection, Result};
+use crate::models::Track;
 
 pub fn insert(
     conn: &Connection,
@@ -27,9 +28,9 @@ pub fn insert(
 pub fn pending_metadata(conn: &Connection) -> Result<Vec<(i64, String)>> {
     let mut stmt = conn.prepare(
         "
-        SELECT id, path
-        FROM tracks
-        WHERE metadata_scanned = 0
+            SELECT id, path
+            FROM tracks
+            WHERE metadata_scanned = 0
         ",
     )?;
 
@@ -50,15 +51,42 @@ pub fn update_metadata(
         "
         UPDATE tracks
         SET
-            title=?,
-            artist=?,
-            album=?,
-            duration=?,
-            metadata_scanned=1
-        WHERE id=?
+            title = ?1,
+            artist = ?2,
+            album = ?3,
+            duration = ?4,
+            metadata_scanned = 1
+        WHERE id = ?5
         ",
         (title, artist, album, duration, id),
     )?;
 
     Ok(())
+}
+
+pub fn get_all(conn: &Connection) -> Result<Vec<Track>> {
+    let mut stmt = conn.prepare(
+        "
+            SELECT
+                id,
+                title,
+                artist,
+                album,
+                filename
+            FROM tracks
+            ORDER BY filename ASC
+        ",
+    )?;
+
+    let rows = stmt.query_map([], |row| {
+        Ok(Track {
+            id: row.get(0)?,
+            title: row.get(1)?,
+            artist: row.get(2)?,
+            album: row.get(3)?,
+            filename: row.get(4)?,
+        })
+    })?;
+
+    Ok(rows.filter_map(Result::ok).collect())
 }

@@ -1,10 +1,40 @@
+use crate::models::Track;
+use crate::settings::{load_music_folders, save_music_folders};
+use crate::tracks::get_all;
 use crate::{scanner, state::AppState, tracks};
 use std::time::UNIX_EPOCH;
 use tauri::State;
 use walkdir::WalkDir;
 
 #[tauri::command]
+pub fn get_tracks(state: State<AppState>) -> Result<Vec<Track>, String> {
+    let conn = state.conn.lock().map_err(|e| e.to_string())?;
+
+    get_all(&conn).map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub fn save_settings(folders: Vec<String>, state: State<AppState>) -> Result<(), String> {
+    let conn = state.conn.lock().map_err(|e| e.to_string())?;
+
+    save_music_folders(&conn, &folders).map_err(|e| e.to_string())?;
+
+    Ok(())
+}
+
+#[tauri::command]
+pub fn load_settings(state: State<AppState>) -> Result<Vec<String>, String> {
+    let conn = state.conn.lock().map_err(|e| e.to_string())?;
+
+    let folders = load_music_folders(&conn).map_err(|e| e.to_string())?;
+
+    Ok(folders)
+}
+
+#[tauri::command]
 pub fn scan_music_folders(folders: Vec<String>, state: State<AppState>) -> Result<(), String> {
+    println!("Scanning folders");
+    
     let conn = state.conn.lock().map_err(|e| e.to_string())?;
 
     let extensions = ["mp3", "flac", "ogg", "wav", "m4a", "aac"];

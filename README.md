@@ -1,5 +1,9 @@
 # MP Music
 
-Musica player scritto in Rust e Tauri
+Music player scritto in Rust e Tauri
 
-> C:\Users\fermat\AppData\Roaming\MPMusic
+Path db Windows:
+> C:\Users\UTENTE\AppData\Roaming\MPMusic
+
+Path db Linux:
+> /home/UTENTE/.local/share/com.fermat.mp-music
