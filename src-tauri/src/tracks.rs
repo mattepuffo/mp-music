@@ -1,5 +1,5 @@
-use rusqlite::{Connection, Result};
 use crate::models::Track;
+use rusqlite::{Connection, Result};
 
 pub fn insert(
     conn: &Connection,

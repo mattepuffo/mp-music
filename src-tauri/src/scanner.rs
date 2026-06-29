@@ -1,7 +1,7 @@
+use crate::tracks::{pending_metadata, update_metadata};
 use lofty::prelude::*;
 use lofty::probe::Probe;
 use rusqlite::Connection;
-use crate::tracks::{pending_metadata, update_metadata};
 
 pub fn scan_metadata(conn: &Connection) -> Result<(), Box<dyn std::error::Error>> {
     let tracks = pending_metadata(conn)?;

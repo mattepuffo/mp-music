@@ -34,7 +34,7 @@ pub fn load_settings(state: State<AppState>) -> Result<Vec<String>, String> {
 #[tauri::command]
 pub fn scan_music_folders(folders: Vec<String>, state: State<AppState>) -> Result<(), String> {
     println!("Scanning folders");
-    
+
     let conn = state.conn.lock().map_err(|e| e.to_string())?;
 
     let extensions = ["mp3", "flac", "ogg", "wav", "m4a", "aac"];
