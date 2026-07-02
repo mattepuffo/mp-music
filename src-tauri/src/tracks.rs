@@ -72,7 +72,8 @@ pub fn get_all(conn: &Connection) -> Result<Vec<Track>> {
                 title,
                 artist,
                 album,
-                filename
+                filename,
+                modified
             FROM tracks
             ORDER BY filename ASC
         ",
@@ -85,6 +86,7 @@ pub fn get_all(conn: &Connection) -> Result<Vec<Track>> {
             artist: row.get(2)?,
             album: row.get(3)?,
             filename: row.get(4)?,
+            modified: row.get(5)?,
         })
     })?;
 

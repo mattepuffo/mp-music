@@ -1,4 +1,4 @@
-import {createSignal, createEffect, For, Show} from "solid-js";
+import {createSignal, createEffect, createMemo, For, Show} from "solid-js";
 import {invoke} from "@tauri-apps/api/core";
 
 type Track = {
@@ -7,12 +7,65 @@ type Track = {
     artist: string | null;
     album: string | null;
     filename: string;
+    modified: number;
 };
 
 function Tracks() {
     const [folders, setFolders] = createSignal<string[]>([]);
     const [tracks, setTracks] = createSignal<Track[]>([]);
     const [loading, setLoading] = createSignal(false);
+    const [sortAsc, setSortAsc] = createSignal(true);
+    const [search, setSearch] = createSignal("");
+
+    const [sortColumn, setSortColumn] = createSignal<
+        "title" | "artist" | "album" | "filename" | "modified"
+    >("filename");
+
+    const sortBy = (
+        column: "title" | "artist" | "album" | "filename" | "modified"
+    ) => {
+        if (sortColumn() === column) {
+            setSortAsc(!sortAsc());
+        } else {
+            setSortColumn(column);
+            setSortAsc(true);
+        }
+    };
+
+    const filteredTracks = createMemo(() => {
+        const text = search().trim().toLowerCase();
+
+        let result = tracks();
+
+        if (text !== "") {
+            result = result.filter(track =>
+                (track.title ?? "").toLowerCase().includes(text) ||
+                (track.artist ?? "").toLowerCase().includes(text) ||
+                (track.album ?? "").toLowerCase().includes(text) ||
+                track.filename.toLowerCase().includes(text)
+            );
+        }
+
+        result = [...result].sort((a, b) => {
+            const column = sortColumn();
+
+            let av: any = a[column];
+            let bv: any = b[column];
+
+            if (typeof av === "string") av = av.toLowerCase();
+            if (typeof bv === "string") bv = bv.toLowerCase();
+
+            if (av == null) av = "";
+            if (bv == null) bv = "";
+
+            if (av < bv) return sortAsc() ? -1 : 1;
+            if (av > bv) return sortAsc() ? 1 : -1;
+
+            return 0;
+        });
+
+        return result;
+    });
 
     const loadFolders = async () => {
         const res = await invoke<string[]>("load_settings");
@@ -76,6 +129,16 @@ function Tracks() {
             {/* CONTENT */}
             <div class="flex-grow-1 min-vh-0 overflow-auto">
 
+                <div class="p-3 border-bottom">
+                    <input
+                        class="form-control"
+                        type="search"
+                        placeholder="Search..."
+                        value={search()}
+                        onInput={(e) => setSearch(e.currentTarget.value)}
+                    />
+                </div>
+
                 <Show
                     when={tracks().length > 0}
                     fallback={
@@ -86,17 +149,32 @@ function Tracks() {
                 >
                     <table class="table table-hover table-sm align-middle">
 
-                        <thead>
+                        <thead class="table-light position-sticky top-0">
                             <tr>
-                                <th>Title</th>
-                                <th>Artist</th>
-                                <th>Album</th>
-                                <th>File</th>
+                                <th role="button" onClick={() => sortBy("title")}>
+                                    Title
+                                </th>
+
+                                <th role="button" onClick={() => sortBy("artist")}>
+                                    Artist
+                                </th>
+
+                                <th role="button" onClick={() => sortBy("album")}>
+                                    Album
+                                </th>
+
+                                <th role="button" onClick={() => sortBy("filename")}>
+                                    File
+                                </th>
+
+                                <th role="button" onClick={() => sortBy("modified")}>
+                                    Modified
+                                </th>
                             </tr>
                         </thead>
 
                         <tbody>
-                            <For each={tracks()}>
+                            <For each={filteredTracks()}>
                                 {(track) => (
                                     <tr>
                                         <td>{track.title ?? "-"}</td>
@@ -104,6 +182,9 @@ function Tracks() {
                                         <td>{track.album ?? "-"}</td>
                                         <td class="text-muted small">
                                             {track.filename}
+                                        </td>
+                                        <td class="text-nowrap">
+                                            {new Date(track.modified * 1000).toLocaleString()}
                                         </td>
                                     </tr>
                                 )}

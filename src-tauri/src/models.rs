@@ -10,4 +10,5 @@ pub struct Track {
     pub artist: Option<String>,
     pub album: Option<String>,
     pub filename: String,
+    pub modified: i64,
 }
